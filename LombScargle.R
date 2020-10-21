@@ -53,7 +53,7 @@ noktaboyut <- 1
 noktatur <- 16
 noktarenk <- "#00000090"
 
-# Eksen
+# Eksen: Ilgili O-C grafigi icin duzenlenmeli!
 xi <- -1000
 xs <- 500
 yi <- -0.003
@@ -134,13 +134,13 @@ dev.off()
 # pdf(), png(), postscript(): saydamligi desteklemez: pdf'i eps'ye cevir.
 yazdir <- 1 
 if(yazdir){
-png(paste0(ciktiAdi,".png"))#, width = 40, height = 30)
+png(paste0(ciktiAdi,"-LSP.png"))#, width = 40, height = 30)
 # En altta dev.off komutunu kapatmali; bu nedenle 'yazdir' degiseni ile kontrol ediliyor.
 }
 ### --GRAFIGI YAZDIR-- ###
 ##########################
 
-# Grafiði Biçimlendirme 
+# LSP Grafiði Biçimlendirme 
 if(xekseni == 'frequency'){xbaslik <- xbaslik1[i]} else {xbaslik <- xbaslik2[i]}
 #dev.new()
 par(bg=NA, las=1, ps=20, lwd=2, mar=c(kenaralt,kenarsol,kenarust,kenarsag))
@@ -170,7 +170,7 @@ dev.off() }
 dev.new()
 if(xekseni == 'frequency'){ donem <- 1/ifelse(nf==1,lspcozum$peak.at[2],tepeler[nf-1,1]) } else { donem <- ifelse(nf==1,lspcozum$peak.at[2],tepeler[nf-1,1]) }
 plot((veri[,1]-veri[1,1])/donem-as.integer((veri[,1]-veri[1,1])/donem),veri[,2], 
-  xlab=xbaslik3[i], ylab=ybaslik2[i])#, ylim=c(38940,39040))
+  xlab=xbaslik3[i], ylab=ybaslik2[i], xlim=c(xi,xs), ylim=c(yi,ys))#, ylim=c(38940,39040))
 
 # Olasýlýk Daðýlýmý (P-deðeri Histogramý)
 if(FALSE){
