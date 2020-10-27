@@ -230,12 +230,13 @@ sT <- c(sT1eks, sT1, sT1art)
 
 ##############
 # Polinom Fiti
+# y = ax2 + bx + c, The y-intercept is the constant term, c. In every polynomial, the y-intercept is the constant term because the constant term is the value of y when x = 0.
 
 # NOT
 # R polinom fit uygulamasinda asagidaki iki yaklasim ayni olmakla birlikte 
 # degisenlerin 'correlated' olmasini dikkate alir. 
-# sTpoly <- lm(sT ~ poly(Time, 2, raw=F))
-# sTpoly <- lm(sT ~ Time + I(Time^2))
+# sTpoly <- lm(sT ~ poly(Time, 2, raw=F)) # Meth1
+# sTpoly <- lm(sT ~ Time + I(Time^2))     # Meth2
 # Note that when the explanatory variables are strongly correlated,
 # the individual confidence intervals will usually underestimate
 # the uncertainty in the parameter estimates, as indicated by the confidence region
@@ -245,7 +246,7 @@ sT <- c(sT1eks, sT1, sT1art)
 sTfun <- function(Time) { Time + I(Time^2) }
 optimize(sTfun, interval=c(Ti,Ts), maximum=F)
 
-# Polinom Fiti: uncorrelated variables (orthogonal polynomials) 
+# Polinom Fiti: tum egri [ uncorrelated variables (orthogonal polynomials) ]
 sTpoly <- lm(sT ~ poly(Time, 2))
 sTa <- summary(sTpoly)$coefficients[3,1]
 sTb <- summary(sTpoly)$coefficients[2,1]
@@ -253,6 +254,7 @@ sTc <- summary(sTpoly)$coefficients[1,1]
 delta(sTa,sTb,sTc)
 sTpolyroot <- QuadRoot(sTa,sTb,sTc)
 
+# Minimuma yakin secilen iki nokta arasinda interpolasyon icin 10^-yuvarla kadar nokta turetme
 yeniTime <- seq(Ti, Ts, 10^-yuvarla)
 yenidf <- data.frame(Time=yeniTime)
 yenisT <- predict(sTpoly, newdata=yenidf)
@@ -265,7 +267,7 @@ plot(yeniTime, yenisT, type='l', col="grey", cex=0.5)#, ylim=c(-0.02,0.02)) #, x
 points(Time, sT, col="blue", pch=16)
 lines(Time, predict(sTpoly), col="red")
 
-# Polinom Fiti: correlated variables
+# Polinom Fiti: minumuma yakin noktalarin egrisi [ correlated variables ]
 sTpoly2 <- lm(yenisT ~ yeniTime + I(yeniTime^2))
 sTa2 <- summary(sTpoly2)$coefficients[3,1]
 sTb2 <- summary(sTpoly2)$coefficients[2,1]
@@ -286,8 +288,13 @@ T0 <- (-sTb2/(2*sTa2))
 Z <- 1/2*N
 
 # Minima mean error: poly(Time, 2)
+# Tum Egri uzerinden hata hesabi
 sigT0 = sqrt((4*sTa*sTc-(sTb^2))/(4*(sTa^2)*(Z-1)))
-#sigT0 = sqrt(abs((4*sTa2*sTc2-(sTb2^2)))/(4*(sTa2^2)*(Z-1)))
+sigT02 = sigT0^2
+
+# Minumum civari uretilen egrinin hata hesabi
+sigT02_2 = sqrt(abs((4*sTa2*sTc2-(sTb2^2)))/(4*(sTa2^2)*(Z-1)))
+sigT02_2 = sigT02_2^2
 
 #Get our covariance matrix
 v <- vcov(sTpoly2)
@@ -296,24 +303,24 @@ b <- coef(sTpoly2)
 xminvar <- (1/(2*b[3]))^2*v[2,2] + (b[2]/(2*b[3]^2))^2*v[3,3] - (b[2]/(2*b[3]^3))*v[2,3]
 
 # Minima mean error: Time + I(Time^2)
-#sTpolyErr <- lm(sT ~ Time + I(Time^2))
-#sTa <- summary(sTpolyErr)$coefficients[3,1]
-#sTb <- summary(sTpolyErr)$coefficients[2,1]
-#sTc <- summary(sTpolyErr)$coefficients[1,1]
-#sigT02 = sqrt((4*sTa*sTc-(sTb^2))/(4*(sTa^2)*(Z-1)))
+#sTpolyMeth2 <- lm(sT ~ Time + I(Time^2))
+#sTaMeth2 <- summary(sTpolyMeth2)$coefficients[3,1]
+#sTbMeth2 <- summary(sTpolyMeth2)$coefficients[2,1]
+#sTcMeth2 <- summary(sTpolyMeth2)$coefficients[1,1]
+#sigT02Meth2 = sqrt(abs(4*sTaMeth2*sTcMeth2-(sTbMeth2^2))/(4*(sTaMeth2^2)*(Z-1)))
 
 # Polinom Fiti
 ##############
 
 T0 #+Tbas_tam
 minima
-sigT0
+sigT02
 n
 Time
 sT
 sTpoly
 
-yaz <- paste0(dosyalar[i],"\t", T0+Tbas_tam,"\t", sigT0)
+yaz <- paste0(dosyalar[i],"\t", T0+Tbas_tam,"\t", sigT02)
 write(yaz, file="#cikti.dat", append=TRUE)
 
 } # DONGU SONU: i
